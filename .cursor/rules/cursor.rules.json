@@ -1,0 +1,69 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cursorinsight/templates/main/schemas/rules.schema.json",
+
+  "rules": [
+    {
+      "pattern": "src/**/*.jsx",
+      "instructions": [
+        "Use only JavaScript (no TypeScript).",
+        "Use functional components only.",
+        "Use Tailwind CSS for all styling. Do NOT use inline styles or external CSS files.",
+        "Use self-contained, role-based logic where applicable (e.g. show HR sidebar for hr role only)."
+      ]
+    },
+    {
+      "pattern": "src/layouts/**/*.jsx",
+      "instructions": [
+        "Create responsive layouts using Tailwind grid or flex utilities.",
+        "Include a sidebar and topbar in `DashboardLayout.jsx`.",
+        "Sidebar menu should change based on user role (platform vs tenant).",
+        "Implement `toggleSidebar` prop for mobile responsiveness."
+      ]
+    },
+    {
+      "pattern": "src/pages/**/*.jsx",
+      "instructions": [
+        "Each page should be a functional component with minimal logic.",
+        "Only handle UI rendering here. Use hooks or services for logic.",
+        "Use placeholders or mock data for now if real data is not available."
+      ]
+    },
+    {
+      "pattern": "src/hooks/useAuth.js",
+      "instructions": [
+        "Create a custom hook that reads JWT from localStorage or cookie.",
+        "Decode the token using `jwt-decode` to extract `platform_role`, `tenant_role`, and `tenant_id`.",
+        "Provide auth info and login status reactively."
+      ]
+    },
+    {
+      "pattern": "src/router/AppRouter.jsx",
+      "instructions": [
+        "Use `react-router-dom` v6 with `BrowserRouter`, `Routes`, and `Route`.",
+        "Use `Navigate` to redirect users to the correct dashboard after login based on role.",
+        "Support `ProtectedRoute` and `RoleGuard` components for route-based access control."
+      ]
+    },
+    {
+      "pattern": "tailwind.config.js",
+      "instructions": [
+        "Extend the default theme with Inter font and a primary color (blue).",
+        "Include content from `./index.html` and all `src/**/*.{js,jsx}`."
+      ]
+    },
+    {
+      "pattern": "src/components/**/*.jsx",
+      "instructions": [
+        "Make reusable components: `Button`, `Input`, `Sidebar`, `TopBar`.",
+        "Use Tailwind for styling; support `className` override."
+      ]
+    },
+    {
+      "pattern": "src/services/api.js",
+      "instructions": [
+        "Create reusable axios instance with token support via interceptors.",
+        "Add example GET and POST requests with mocked endpoints."
+      ]
+    }
+  ]
+}
