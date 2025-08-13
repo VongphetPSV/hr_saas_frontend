@@ -22,9 +22,9 @@ export default defineConfig({
       }
     },
     hmr: {
-      overlay: true,
-      clientPort: 3000,
-      host: 'localhost'
+      host: 'localhost',
+      protocol: 'ws',
+      port: 3000
     }
   },
   preview: {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useAuth } from '../hooks/useAuth.jsx';
+import { useAuth } from '@/hooks/useAuth';
 import { Bell, Search, ChevronDown, User } from 'lucide-react';
 
 const TopBar = () => {

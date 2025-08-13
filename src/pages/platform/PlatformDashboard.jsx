@@ -1,4 +1,4 @@
-import { useAuth } from '../../hooks/useAuth.jsx';
+import { useAuth } from '@/hooks/useAuth';
 import Card from '../../components/Card';
 import { Settings, Users, BarChart3, Shield, Database, Globe } from 'lucide-react';
 

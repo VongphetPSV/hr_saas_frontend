@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
+import { useCurrentUser } from '@/hooks/useAuth';
 
 const MenuItem = ({ to, icon, children, isActive }) => (
   <Link
@@ -15,9 +15,9 @@ const MenuItem = ({ to, icon, children, isActive }) => (
   </Link>
 );
 
-const Sidebar = () => {
+export function Sidebar() {
   const location = useLocation();
-  const { user } = useAuth();
+  const { data: user } = useCurrentUser();
   const platformRole = user?.platform_role?.toUpperCase();
   const tenantRole = user?.tenant_role?.toLowerCase();
 
@@ -221,6 +221,4 @@ const Sidebar = () => {
       </div>
     </div>
   );
-};
-
-export default Sidebar;
+}

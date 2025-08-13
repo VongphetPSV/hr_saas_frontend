@@ -1,4 +1,4 @@
-import { useAuth } from '../hooks/useAuth.jsx';
+import { useAuth } from '@/hooks/useAuth';
 import Sidebar from '../components/Sidebar';
 import TopBar from '../components/TopBar';
 

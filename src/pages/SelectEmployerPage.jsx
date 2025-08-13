@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth.jsx';
+import { useAuth } from '@/hooks/useAuth';
 import Button from '../components/Button';
 import Card from '../components/Card';
 import { Building2, Search, ArrowRight, Users } from 'lucide-react';

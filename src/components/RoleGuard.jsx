@@ -1,4 +1,4 @@
-import { useAuth } from '../hooks/useAuth.jsx';
+import { useAuth } from '@/hooks/useAuth';
 
 const RoleGuard = ({ children, allowedRoles, allowPlatform = false, allowTenant = false }) => {
   const { user, isPlatformRole, isTenantRole } = useAuth();

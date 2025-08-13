@@ -3,7 +3,7 @@ import { useAnnouncements } from '../../hooks/api/useAnnouncements';
 import { useLeaves } from '../../hooks/api/useLeaves';
 import { useOTRequests } from '../../hooks/api/useOTRequests';
 import Card from '../../components/Card';
-import useAuth from '../../hooks/useAuth';
+import { useCurrentUser } from '@/hooks/useAuth';
 
 const StatCard = ({ title, value, icon, trend }) => (
   <Card>
@@ -38,7 +38,7 @@ const Dashboard = () => {
   const { data: announcements } = useAnnouncements();
   const { data: leaves } = useLeaves({ status: 'pending' });
   const { data: overtimeRequests } = useOTRequests({ status: 'pending' });
-  const { user } = useAuth();
+  const { data: user } = useCurrentUser();
   const isHRAdmin = ['hr', 'admin'].includes(user?.current_tenant_role?.toLowerCase());
 
   if (isLoading) {

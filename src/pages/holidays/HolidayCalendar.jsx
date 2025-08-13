@@ -5,7 +5,7 @@ import { useDeleteHoliday } from '../../hooks/api/useDeleteHoliday';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { toast } from 'react-hot-toast';
-import useAuth from '../../hooks/useAuth';
+import { useCurrentUser } from '@/hooks/useAuth';
 
 const HolidayCalendar = () => {
   const currentYear = new Date().getFullYear();
@@ -14,7 +14,7 @@ const HolidayCalendar = () => {
   const { data: holidays, isLoading } = useHolidays(selectedYear);
   const createHolidayMutation = useCreateHoliday();
   const deleteHolidayMutation = useDeleteHoliday();
-  const { user } = useAuth();
+  const { data: user } = useCurrentUser();
   const isHRAdmin = ['hr', 'admin'].includes(user?.current_tenant_role?.toLowerCase());
 
   const handleCreateHoliday = async (data) => {

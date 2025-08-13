@@ -1,5 +1,5 @@
 import "./index.css";
-import { AuthProvider } from './hooks/useAuth.jsx';
+import { useAuth } from '@/hooks/useAuth';
 import AppRouter from './router/AppRouter';
 import { TooltipProvider } from './components/providers/TooltipProvider';
 

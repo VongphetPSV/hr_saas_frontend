@@ -4,13 +4,13 @@ import { useCreateAnnouncement } from '../../hooks/api/useCreateAnnouncement';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
 import { toast } from 'react-hot-toast';
-import useAuth from '../../hooks/useAuth';
+import { useCurrentUser } from '@/hooks/useAuth';
 
 const AnnouncementList = () => {
   const { data: announcements, isLoading } = useAnnouncements();
   const markReadMutation = useMarkAnnouncementRead();
   const createAnnouncementMutation = useCreateAnnouncement();
-  const { user } = useAuth();
+  const { data: user } = useCurrentUser();
   const isHRAdmin = ['hr', 'admin'].includes(user?.current_tenant_role?.toLowerCase());
 
   const handleMarkRead = async (announcementId) => {

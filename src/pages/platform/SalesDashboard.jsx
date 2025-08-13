@@ -1,4 +1,4 @@
-import { useAuth } from '../../hooks/useAuth.jsx';
+import { useAuth } from '@/hooks/useAuth';
 import Card from '../../components/Card';
 import { Target, TrendingUp, Users, DollarSign, Phone, Calendar } from 'lucide-react';
 

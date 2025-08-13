@@ -1,4 +1,4 @@
-import { useAuth } from '../../hooks/useAuth.jsx';
+import { useAuth } from '@/hooks/useAuth';
 import Card from '../../components/Card';
 import { DollarSign, TrendingUp, CreditCard, FileText, Calculator, PieChart } from 'lucide-react';
 
