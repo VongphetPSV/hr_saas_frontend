@@ -55,7 +55,7 @@ const HRDashboard = () => {
       {/* Welcome Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg p-6">
         <h1 className="text-2xl font-bold mb-2">Welcome back, {user?.name}!</h1>
-        <p className="text-blue-100">Here's your HR overview for today at {user?.tenant || 'Your Company'}.</p>
+        <p className="text-blue-100">Here's your HR overview for today at {user?.tenant?.name || 'Your Company'}.</p>
       </div>
 
       {/* HR Stats */}

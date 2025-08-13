@@ -1,12 +1,15 @@
 import "./index.css";
 import { AuthProvider } from './hooks/useAuth.jsx';
 import AppRouter from './router/AppRouter';
+import { TooltipProvider } from './components/providers/TooltipProvider';
 
 function App() {
   return (
-    <AuthProvider>
-      <AppRouter />
-    </AuthProvider>
+    <TooltipProvider>
+      <AuthProvider>
+        <AppRouter />
+      </AuthProvider>
+    </TooltipProvider>
   );
 }
 

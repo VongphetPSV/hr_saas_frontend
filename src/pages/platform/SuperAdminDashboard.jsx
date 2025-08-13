@@ -1,9 +1,12 @@
-import { useAuth } from '../../hooks/useAuth.jsx';
+import { useAuth } from '../../hooks/useAuth.js';
 import Card from '../../components/Card';
 import { Users, Building2, TrendingUp, DollarSign, Activity, AlertCircle } from 'lucide-react';
 
 const SuperAdminDashboard = () => {
   const { user } = useAuth();
+  
+  // Log user data to verify structure
+  console.log('Dashboard user data:', user);
 
   const stats = [
     { label: 'Total Tenants', value: '156', change: '+12%', icon: Building2, color: 'blue' },
@@ -28,7 +31,9 @@ const SuperAdminDashboard = () => {
     <div className="space-y-6">
       {/* Welcome Header */}
       <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg p-6">
-        <h1 className="text-2xl font-bold mb-2">Welcome back, {user?.name}!</h1>
+        <h1 className="text-2xl font-bold mb-2">
+          Welcome back, {user?.full_name || 'Admin'}!
+        </h1>
         <p className="text-primary-100">Here's what's happening with your platform today.</p>
       </div>
 
@@ -40,14 +45,24 @@ const SuperAdminDashboard = () => {
             <Card key={index} padding="md">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                  <p className={`text-sm ${stat.change.startsWith('+') ? 'text-green-600' : 'text-gray-600'}`}>
-                    {stat.change} from last month
-                  </p>
+                  <p className="text-sm font-medium text-slate-600">{stat.label}</p>
+                  <div className="mt-1">
+                    <p className="text-2xl font-semibold text-slate-900">{stat.value}</p>
+                    <p className={`text-sm ${stat.change.startsWith('+') ? 'text-emerald-600' : 'text-slate-600'}`}>
+                      {stat.change} from last month
+                    </p>
+                  </div>
                 </div>
-                <div className={`p-3 rounded-full bg-${stat.color}-100`}>
-                  <Icon className={`text-${stat.color}-600`} size={24} />
+                <div className={`flex h-12 w-12 items-center justify-center rounded-full ${
+                  stat.color === 'blue' ? 'bg-blue-100' :
+                  stat.color === 'green' ? 'bg-emerald-100' :
+                  stat.color === 'yellow' ? 'bg-amber-100' : 'bg-slate-100'
+                }`}>
+                  <Icon className={`h-6 w-6 ${
+                    stat.color === 'blue' ? 'text-blue-600' :
+                    stat.color === 'green' ? 'text-emerald-600' :
+                    stat.color === 'yellow' ? 'text-amber-600' : 'text-slate-600'
+                  }`} />
                 </div>
               </div>
             </Card>

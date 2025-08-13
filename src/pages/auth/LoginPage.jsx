@@ -1,229 +1,200 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth.jsx';
-import Button from '../../components/Button';
-import Input from '../../components/Input';
+import { useAuth } from '../../hooks/useAuth.js';
 import Card from '../../components/Card';
-import { Building2, Phone, Lock, Globe } from 'lucide-react';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+
+const validateLaoPhoneNumber = (phone) => {
+  // Remove any spaces or dashes
+  const cleanPhone = phone.replace(/[\s-]/g, '');
+  
+  // Check if it's exactly 8 digits and starts with 2, 5, 7, or 8
+  const isValid = /^[2578]\d{7}$/.test(cleanPhone);
+  
+  if (!isValid) {
+    return 'Please enter a valid 8-digit Lao phone number starting with 2, 5, 7, or 8';
+  }
+  
+  return '';
+};
+
+const formatPhoneNumber = (value) => {
+  // Remove any non-digit characters
+  const digits = value.replace(/\D/g, '');
+  
+  // Format as XX-XXX-XXX
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 5) return `${digits.slice(0, 2)}-${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}-${digits.slice(2, 5)}-${digits.slice(5, 8)}`;
+};
 
 const LoginPage = () => {
+  const { login, isLoggingIn, loginError } = useAuth();
   const [formData, setFormData] = useState({
     phone: '',
-    password: ''
+    password: '',
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [language, setLanguage] = useState('en'); // en, th, or lo
-  
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const [phoneError, setPhoneError] = useState('');
 
-  const translations = {
-    en: {
-      title: 'HRM SaaS Platform',
-      subtitle: 'Sign in to your account',
-      phone: 'Phone Number',
-      password: 'Password',
-      signin: 'Sign In',
-      forgotPassword: 'Forgot your password?',
-      noAccount: "Don't have an account?",
-      contactAdmin: 'Contact Administrator',
-      orContinueWith: 'Or continue with',
-      welcomeBack: 'Welcome back',
-      secureLogin: 'Secure login to your HRM dashboard'
-    },
-    th: {
-      title: 'แพลตฟอร์ม HRM SaaS',
-      subtitle: 'เข้าสู่ระบบบัญชีของคุณ',
-      phone: 'หมายเลขโทรศัพท์',
-      password: 'รหัสผ่าน',
-      signin: 'เข้าสู่ระบบ',
-      forgotPassword: 'ลืมรหัสผ่าน?',
-      noAccount: 'ไม่มีบัญชี?',
-      contactAdmin: 'ติดต่อผู้ดูแลระบบ',
-      orContinueWith: 'หรือเข้าสู่ระบบด้วย',
-      welcomeBack: 'ยินดีต้อนรับกลับ',
-      secureLogin: 'เข้าสู่ระบบอย่างปลอดภัยสู่แดชบอร์ด HRM ของคุณ'
-    },
-    lo: {
-      title: 'ແພລດຟອມ HRM SaaS',
-      subtitle: 'ເຂົ້າສູ່ລະບົບບັນຊີຂອງເຈົ້າ',
-      phone: 'ເບີໂທລະສັບ',
-      password: 'ລະຫັດຜ່ານ',
-      signin: 'ເຂົ້າສູ່ລະບົບ',
-      forgotPassword: 'ລືມລະຫັດຜ່ານ?',
-      noAccount: 'ບໍ່ມີບັນຊີ?',
-      contactAdmin: 'ຕິດຕໍ່ຜູ້ຄຸ້ມຄອງລະບົບ',
-      orContinueWith: 'ຫຼືເຂົ້າສູ່ລະບົບດ້ວຍ',
-      welcomeBack: 'ຍິນດີຕ້ອນຮັບກັບຄືນ',
-      secureLogin: 'ເຂົ້າສູ່ລະບົບຢ່າງປອດໄພສູ່ແດັສບອດ HRM ຂອງເຈົ້າ'
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name === 'phone') {
+      // Only allow digits, spaces, and dashes
+      const sanitizedValue = value.replace(/[^\d\s-]/g, '');
+      const formattedValue = formatPhoneNumber(sanitizedValue);
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: formattedValue
+      }));
+      
+      // Clear phone error when user starts typing
+      setPhoneError('');
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
   };
-
-  const t = translations[language];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    setPhoneError('');
+
+    // Validate phone number
+    const phoneValidationError = validateLaoPhoneNumber(formData.phone);
+    if (phoneValidationError) {
+      setPhoneError(phoneValidationError);
+      return;
+    }
 
     try {
-      // Simulate API call - Replace with actual authentication
-      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6ImFkbWluIiwidGVuYW50IjoiYWNtZS1jb3JwIiwiZW1haWwiOiJqb2huQGFjbWUuY29tIiwiZXhwIjoxNzM3MzE0MDM3fQ.ZXLpF7xj6yx-TaoJX3FIsyV9nAd8Cn5RtPgp7YfM5T4';
-      
-      if (login(mockToken)) {
-        navigate('/dashboard');
-      } else {
-        setError('Invalid credentials');
-      }
+      // Remove formatting before sending to API and pass as phone_number
+      const cleanPhone = formData.phone.replace(/[\s-]/g, '');
+      await login({
+        phone_number: cleanPhone,
+        password: formData.password,
+      });
+      // No need to handle redirect here as it's handled in the useAuth hook
     } catch (err) {
-      setError('Login failed. Please try again.');
-    } finally {
-      setLoading(false);
+      const errorData = err.response?.data;
+      console.log('Login error details:', errorData);
+      
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (errorData) {
+        if (errorData.detail) {
+          if (Array.isArray(errorData.detail)) {
+            // Handle validation errors array
+            errorMessage = errorData.detail.map(e => e.msg || e.message || e).join(', ');
+          } else {
+            // Handle string error message
+            errorMessage = String(errorData.detail);
+          }
+        } else if (errorData.message) {
+          errorMessage = String(errorData.message);
+        } else if (typeof errorData === 'string') {
+          errorMessage = errorData;
+        }
+      }
+      
+      // Set specific error messages for phone/password fields if applicable
+      if (errorMessage.toLowerCase().includes('phone')) {
+        setPhoneError(errorMessage);
+      } else {
+        setError(errorMessage);
+      }
     }
   };
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  // Derive a safe, human-readable error string for rendering
+  const normalizedLoginError = (() => {
+    if (!loginError) return '';
+    const data = loginError.response?.data;
+    if (typeof data === 'string') return data;
+    if (typeof data?.detail === 'string') return data.detail;
+    if (Array.isArray(data?.detail)) {
+      const msgs = data.detail.map((e) => e?.msg || e).filter(Boolean);
+      if (msgs.length) return msgs.join(', ');
+    }
+    if (data?.message) return String(data.message);
+    return loginError.message || 'Login failed. Please try again.';
+  })();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex">
-      {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary-600 text-white p-12 flex-col justify-between">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <Card className="max-w-md w-full space-y-8">
         <div>
-          <div className="flex items-center space-x-3">
-            <Building2 size={40} />
-            <h1 className="text-3xl font-bold">{t.title}</h1>
-          </div>
-          <div className="mt-12">
-            <h2 className="text-4xl font-bold mb-4">{t.welcomeBack}</h2>
-            <p className="text-xl text-primary-100">{t.secureLogin}</p>
-          </div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Sign in to your account
+          </h2>
         </div>
-        
-        <div className="space-y-6">
-          <div className="bg-primary-700/30 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-2">Multi-tenant Architecture</h3>
-            <p className="text-primary-100">Secure, scalable HRM solution for organizations of all sizes</p>
-          </div>
-          <div className="bg-primary-700/30 rounded-lg p-6">
-            <h3 className="text-lg font-semibold mb-2">Role-based Access</h3>
-            <p className="text-primary-100">Granular permissions for platform and tenant administrators</p>
-          </div>
-        </div>
-      </div>
 
-      {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
-          {/* Language Toggle */}
-          <div className="flex justify-end mb-6">
-            <button
-              onClick={() => {
-                const nextLanguage = language === 'en' ? 'th' : language === 'th' ? 'lo' : 'en';
-                setLanguage(nextLanguage);
-              }}
-              className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              <Globe size={16} />
-              <span>
-                {language === 'en' ? 'ไทย' : language === 'th' ? 'ລາວ' : 'ENG'}
-              </span>
-            </button>
-          </div>
-
-          <Card padding="lg" shadow="lg">
-            <div className="text-center mb-8">
-              <div className="lg:hidden flex items-center justify-center space-x-2 mb-4">
-                <Building2 size={32} className="text-primary-600" />
-                <h1 className="text-2xl font-bold text-gray-900">{t.title}</h1>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{t.subtitle}</h2>
-            </div>
-
-            {error && (
-              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                {error}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="phone" className="sr-only">
+                Phone Number
+              </label>
               <Input
-                label={t.phone}
+                id="phone"
                 name="phone"
                 type="tel"
+                autoComplete="tel"
+                required
+                placeholder="Phone number (e.g., 20-234-567)"
                 value={formData.phone}
                 onChange={handleChange}
-                placeholder="+66 xx xxx xxxx"
-                required
-                className="pl-10"
+                error={phoneError}
+                maxLength={11} // XX-XXX-XXX format
               />
-              <div className="absolute left-3 top-9 text-gray-400">
-                <Phone size={16} />
-              </div>
-
-              <div className="relative">
-                <Input
-                  label={t.password}
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  required
-                  className="pl-10"
-                />
-                <div className="absolute left-3 top-9 text-gray-400">
-                  <Lock size={16} />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <label className="flex items-center">
-                  <input type="checkbox" className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
-                  <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                </label>
-                <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-500">
-                  {t.forgotPassword}
-                </Link>
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full" 
-                size="lg"
-                loading={loading}
-                disabled={!formData.phone || !formData.password}
-              >
-                {t.signin}
-              </Button>
-            </form>
-
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                {t.noAccount}{' '}
-                <Link to="/contact" className="text-primary-600 hover:text-primary-500 font-medium">
-                  {t.contactAdmin}
-                </Link>
-              </p>
             </div>
-
-            {/* Demo Credentials */}
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</h4>
-              <div className="text-xs text-gray-600 space-y-1">
-                <p><strong>Admin:</strong> +66123456789 / admin123</p>
-                <p><strong>HR:</strong> +66987654321 / hr123</p>
-                <p><strong>Staff:</strong> +66555666777 / staff123</p>
-              </div>
+            <div>
+              <label htmlFor="password" className="sr-only">
+                Password
+              </label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+              />
             </div>
-          </Card>
-        </div>
-      </div>
+          </div>
+
+          {(error || normalizedLoginError) && (
+            <div className="text-red-500 text-sm text-center">
+              {typeof (error || normalizedLoginError) === 'string'
+                ? (error || normalizedLoginError)
+                : JSON.stringify(error || normalizedLoginError)}
+            </div>
+          )}
+
+          <div>
+            <Button
+              type="submit"
+              variant="primary"
+              className="w-full"
+              disabled={isLoggingIn}
+              loading={isLoggingIn}
+            >
+              {isLoggingIn ? 'Signing in...' : 'Sign in'}
+            </Button>
+          </div>
+
+          <div className="text-sm text-center text-gray-600">
+            Enter your 8-digit phone number starting with 2, 5, 7, or 8
+          </div>
+        </form>
+      </Card>
     </div>
   );
 };

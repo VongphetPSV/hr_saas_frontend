@@ -41,7 +41,9 @@ const TopBar = () => {
             </div>
             <div className="hidden md:block text-left">
               <p className="text-sm font-medium">{user?.name}</p>
-              <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
+              <p className="text-xs text-gray-500 capitalize">
+                {(user?.current_tenant_role || user?.platform_role)?.replace('_', ' ')}
+              </p>
             </div>
             <ChevronDown size={16} />
           </button>

@@ -56,11 +56,46 @@ const SelectEmployerPage = () => {
     employer.industry.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const generateMockTenantToken = (employer, userRole) => {
+    const now = Math.floor(Date.now() / 1000);
+    const exp = now + (24 * 60 * 60); // 24 hours
+
+    const payload = {
+      sub: user?.id || '123456789',
+      name: user?.name || 'Demo User',
+      email: user?.email || 'user@demo.com',
+      tenant_roles: [userRole],
+      tenant: {
+        id: employer.id,
+        name: employer.name,
+        domain: employer.domain
+      },
+      iat: now,
+      exp: exp
+    };
+
+    // Simple base64 encoding for demo (not secure, for demo only)
+    return 'mock_token_' + btoa(JSON.stringify(payload));
+  };
+
   const handleSelectEmployer = () => {
     if (selectedEmployer) {
-      // In a real app, this would update the user's context and token
-      console.log('Selected employer:', selectedEmployer);
-      navigate('/dashboard');
+      // For demo purposes, assign a default role based on user or use 'staff'
+      // In a real app, this would come from the backend after employer selection
+      const defaultRole = user?.platform_role === 'user' ? 'staff' : 'admin';
+      
+      // Generate mock tenant token
+      const tenantToken = generateMockTenantToken(selectedEmployer, defaultRole);
+      
+      // Login with tenant token
+      const result = login(tenantToken, 'tenant');
+      
+      if (result.success) {
+        navigate(result.redirectTo);
+      } else {
+        console.error('Failed to set tenant context:', result.error);
+        navigate('/dashboard');
+      }
     }
   };
 
@@ -164,6 +199,21 @@ const SelectEmployerPage = () => {
             <p className="text-sm text-gray-600">
               <strong>Can't find your employer?</strong> Contact your HR administrator or 
               email support@hrmsaas.com for assistance.
+            </p>
+            {user?.platform_role && (
+              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+                <p className="text-xs text-blue-700">
+                  <strong>Platform User:</strong> You have platform role "{user.platform_role}". 
+                  Select an employer to access tenant-specific features.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Demo Note */}
+          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-800">
+              <strong>Demo Mode:</strong> Selecting an employer will assign you a default tenant role based on your platform permissions.
             </p>
           </div>
         </Card>
