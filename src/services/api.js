@@ -1,5 +1,5 @@
 // API service for HRM SaaS application
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.hrmsaas.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.hrmsaas.com';
 
 class ApiService {
   constructor() {

@@ -1,15 +1,10 @@
-import Spinner from '../Spinner';
-
-export const ResolvingTenant = () => {
+export function ResolvingTenant() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-      <Spinner className="h-12 w-12 text-primary-600" />
-      <h2 className="mt-4 text-lg font-medium text-gray-900">
-        Preparing your workspace...
-      </h2>
-      <p className="mt-2 text-sm text-gray-500">
-        This will only take a moment
-      </p>
+    <div className="min-h-screen grid place-items-center text-slate-600">
+      <div className="flex items-center gap-3">
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-transparent" />
+        <span>Preparing your workspace…</span>
+      </div>
     </div>
   );
-};
+}

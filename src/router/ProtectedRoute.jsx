@@ -1,55 +1,57 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth, useCurrentUser } from '@/hooks/useAuth';
+import { computeRedirectPath } from '@/hooks/useAuth';
+import { useAuthContext } from '@/components/providers/AuthProvider';
 import { ResolvingTenant } from '../components/common/ResolvingTenant';
 import { NoAccess } from '../components/common/NoAccess';
 
-const ProtectedRoute = ({ children, roles, requireTenant = true }) => {
+function ProtectedRoute({ children, roles, requireTenant = true }) {
   const location = useLocation();
-  const { data: user, isLoading: isUserLoading } = useCurrentUser();
-  const { authState } = useAuth();
-  const isSelectEmployerRoute = location.pathname === '/select-employer';
+  const { user, isLoading } = useAuthContext();
 
-  // Show loading spinner while checking auth
-  if (isUserLoading) {
-    return <ResolvingTenant />;
+  // 1. Wait for auth check to complete
+  if (isLoading) {
+    return null;
   }
 
-  // Show loading spinner while resolving tenant
-  if (authState === 'resolving-tenant' && !isSelectEmployerRoute) {
-    return <ResolvingTenant />;
-  }
-
-  // Redirect to login if not authenticated
+  // 2. Redirect to login if no user
   if (!user) {
     return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
-  // Special case: /select-employer is accessible right after login
-  if (isSelectEmployerRoute) {
-    // Only allow access if user needs to select employer
-    if (user.platformRole === 'USER' && !localStorage.getItem('tenant_id')) {
-      return children;
+  // 3. Get tenant info once
+  const tenantId = localStorage.getItem('tenant_id');
+  const tenantRole = localStorage.getItem('tenant_role');
+
+  // 4. Handle platform users (e.g., super admin) - they don't need tenant
+  if (user.platformRole && user.platformRole !== 'USER') {
+    // Allow access to their routes
+    return children;
+  }
+
+  // 5. Handle regular users
+  if (user.platformRole === 'USER') {
+    // On employer selection page
+    if (location.pathname === '/select-employer') {
+      // Allow if they need to select employer
+      if (!tenantId) {
+        return children;
+      }
+      // Redirect to dashboard if they already have a tenant
+      return <Navigate to={computeRedirectPath({ platformRole: 'USER', tenantRole })} replace />;
     }
-    // If user already has a tenant, redirect to their dashboard
-    return <Navigate to={computeRedirectPath({ 
-      platformRole: user.platformRole,
-      tenantRole: localStorage.getItem('tenant_role')
-    })} replace />;
+
+    // Require tenant selection for other pages
+    if (requireTenant && !tenantId) {
+      return <Navigate to="/select-employer" replace />;
+    }
   }
 
-  // For tenant routes, ensure we have tenant_id and tenant_role
-  if (requireTenant && !localStorage.getItem('tenant_id')) {
-    return <Navigate to="/select-employer" replace />;
-  }
-
-  // If roles are specified, check if user has required role
+  // 6. Role-based access control
   if (roles?.length > 0) {
     const hasRequiredRole = roles.some(role => {
       const normalizedRole = role.toUpperCase().replace(/-/g, '_');
-      const normalizedPlatformRole = (user.platformRole || '').toUpperCase().replace(/-/g, '_');
-      const tenantRole = localStorage.getItem('tenant_role');
+      const normalizedPlatformRole = user.platformRole.toUpperCase().replace(/-/g, '_');
       const normalizedTenantRole = (tenantRole || '').toUpperCase().replace(/-/g, '_');
-      
       return normalizedPlatformRole === normalizedRole || normalizedTenantRole === normalizedRole;
     });
 
@@ -59,6 +61,6 @@ const ProtectedRoute = ({ children, roles, requireTenant = true }) => {
   }
 
   return children;
-};
+}
 
 export default ProtectedRoute;

@@ -1,5 +1,5 @@
 import { useAuth } from '@/hooks/useAuth';
-import Sidebar from '../components/Sidebar';
+import Sidebar from '@/components/Sidebar';
 import TopBar from '../components/TopBar';
 
 const DashboardLayout = ({ children }) => {

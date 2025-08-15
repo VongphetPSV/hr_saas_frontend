@@ -15,7 +15,7 @@ const MenuItem = ({ to, icon, children, isActive }) => (
   </Link>
 );
 
-export function Sidebar() {
+export default function Sidebar() {
   const location = useLocation();
   const { data: user } = useCurrentUser();
   const platformRole = user?.platform_role?.toUpperCase();

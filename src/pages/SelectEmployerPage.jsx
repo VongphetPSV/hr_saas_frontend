@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useEmployers } from '@/hooks/api/useEmployers';
 import Button from '../components/Button';
 import Card from '../components/Card';
+import Spinner from '../components/Spinner';
 import { Building2, Search, ArrowRight, Users } from 'lucide-react';
 
 const SelectEmployerPage = () => {
@@ -10,9 +12,17 @@ const SelectEmployerPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { data: employers = [], isLoading, error } = useEmployers();
 
-  // Mock employers data
-  const employers = [
+  // Handle auto-selection when only one employer is available
+  useEffect(() => {
+    if (!isLoading && employers.length === 1) {
+      setSelectedEmployer(employers[0]);
+    }
+  }, [employers, isLoading]);
+
+  // Mock employers data for development
+  const mockEmployers = [
     {
       id: 1,
       name: 'Acme Corporation',
@@ -51,9 +61,12 @@ const SelectEmployerPage = () => {
     }
   ];
 
-  const filteredEmployers = employers.filter(employer =>
+  // Use real employers data if available, fallback to mock data for development
+  const activeEmployers = employers.length > 0 ? employers : mockEmployers;
+  
+  const filteredEmployers = activeEmployers.filter(employer =>
     employer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employer.industry.toLowerCase().includes(searchTerm.toLowerCase())
+    (employer.industry || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const generateMockTenantToken = (employer, userRole) => {
@@ -78,26 +91,40 @@ const SelectEmployerPage = () => {
     return 'mock_token_' + btoa(JSON.stringify(payload));
   };
 
-  const handleSelectEmployer = () => {
-    if (selectedEmployer) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginResult, setLoginResult] = useState(null);
+
+  const handleSelectEmployer = async () => {
+    if (!selectedEmployer || isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
       // For demo purposes, assign a default role based on user or use 'staff'
-      // In a real app, this would come from the backend after employer selection
       const defaultRole = user?.platform_role === 'user' ? 'staff' : 'admin';
       
       // Generate mock tenant token
       const tenantToken = generateMockTenantToken(selectedEmployer, defaultRole);
       
       // Login with tenant token
-      const result = login(tenantToken, 'tenant');
-      
-      if (result.success) {
-        navigate(result.redirectTo);
-      } else {
-        console.error('Failed to set tenant context:', result.error);
-        navigate('/dashboard');
-      }
+      const result = await login(tenantToken, 'tenant');
+      setLoginResult(result);
+    } catch (error) {
+      console.error('Failed to set tenant context:', error);
+      setLoginResult({ success: false, error });
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
+  // Handle navigation after successful login
+  useEffect(() => {
+    if (loginResult?.success) {
+      navigate(loginResult.redirectTo, { replace: true });
+    } else if (loginResult?.error) {
+      // Handle error case - could show error message
+      console.error('Login failed:', loginResult.error);
+    }
+  }, [loginResult, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
@@ -127,9 +154,25 @@ const SelectEmployerPage = () => {
             />
           </div>
 
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-12">
+              <Spinner size="lg" />
+              <p className="mt-4 text-gray-600">Loading employers...</p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-8">
+              <p className="text-red-500">Failed to load employers. Please try again later.</p>
+            </div>
+          )}
+
           {/* Employers Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            {filteredEmployers.map((employer) => (
+          {!isLoading && !error && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+              {filteredEmployers.map((employer) => (
               <div
                 key={employer.id}
                 onClick={() => setSelectedEmployer(employer)}
@@ -168,7 +211,9 @@ const SelectEmployerPage = () => {
             ))}
           </div>
 
-          {filteredEmployers.length === 0 && (
+          )}
+
+          {!isLoading && !error && filteredEmployers.length === 0 && (
             <div className="text-center py-8">
               <Building2 className="mx-auto text-gray-400 mb-3" size={48} />
               <p className="text-gray-500">No employers found matching your search.</p>
@@ -186,11 +231,12 @@ const SelectEmployerPage = () => {
             
             <Button
               onClick={handleSelectEmployer}
-              disabled={!selectedEmployer}
+              disabled={!selectedEmployer || isSubmitting}
+              loading={isSubmitting}
               size="lg"
               className="min-w-32"
             >
-              Continue
+              {isSubmitting ? 'Selecting...' : 'Continue'}
             </Button>
           </div>
 

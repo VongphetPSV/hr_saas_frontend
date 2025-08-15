@@ -22,7 +22,7 @@ import DirectorDashboard from '../pages/tenant/DirectorDashboard';
 import Paywall from '../pages/billing/Paywall';
 
 // Components
-import ProtectedRoute from './ProtectedRoute';
+import  ProtectedRoute  from "@/router/ProtectedRoute";
 import RequirePaidTenant from './guards/RequirePaidTenant';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { PlatformLayout } from '../layouts/PlatformLayout';

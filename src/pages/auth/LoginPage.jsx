@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { useAuth } from '../../hooks/useAuth.js';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth, computeRedirectPath } from '../../hooks/useAuth.js';
 import Card from '../../components/Card';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
@@ -29,13 +30,29 @@ const formatPhoneNumber = (value) => {
 };
 
 const LoginPage = () => {
-  const { login, isLoggingIn, loginError } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login, user, isLoading } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     phone: '',
     password: '',
   });
   const [error, setError] = useState('');
   const [phoneError, setPhoneError] = useState('');
+  const [loginError, setLoginError] = useState('');
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!user) return;
+
+    const redirectPath = computeRedirectPath({
+      platformRole: user.platformRole,
+      tenantRole: localStorage.getItem('tenant_role')
+    });
+
+    navigate(redirectPath, { replace: true });
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,11 +81,14 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     setPhoneError('');
+    setLoginError('');
+    setIsSubmitting(true);
 
     // Validate phone number
     const phoneValidationError = validateLaoPhoneNumber(formData.phone);
     if (phoneValidationError) {
       setPhoneError(phoneValidationError);
+      setIsSubmitting(false);
       return;
     }
 
@@ -79,7 +99,8 @@ const LoginPage = () => {
         phone_number: cleanPhone,
         password: formData.password,
       });
-      // No need to handle redirect here as it's handled in the useAuth hook
+      
+      // useEffect will handle redirection once user data is available
     } catch (err) {
       const errorData = err.response?.data;
       console.log('Login error details:', errorData);
@@ -108,22 +129,14 @@ const LoginPage = () => {
       } else {
         setError(errorMessage);
       }
+      setLoginError(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Derive a safe, human-readable error string for rendering
-  const normalizedLoginError = (() => {
-    if (!loginError) return '';
-    const data = loginError.response?.data;
-    if (typeof data === 'string') return data;
-    if (typeof data?.detail === 'string') return data.detail;
-    if (Array.isArray(data?.detail)) {
-      const msgs = data.detail.map((e) => e?.msg || e).filter(Boolean);
-      if (msgs.length) return msgs.join(', ');
-    }
-    if (data?.message) return String(data.message);
-    return loginError.message || 'Login failed. Please try again.';
-  })();
+  // Normalize the error message to display
+  const normalizedLoginError = loginError || error || phoneError;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -170,11 +183,9 @@ const LoginPage = () => {
             </div>
           </div>
 
-          {(error || normalizedLoginError) && (
+          {normalizedLoginError && (
             <div className="text-red-500 text-sm text-center">
-              {typeof (error || normalizedLoginError) === 'string'
-                ? (error || normalizedLoginError)
-                : JSON.stringify(error || normalizedLoginError)}
+              {normalizedLoginError}
             </div>
           )}
 
@@ -183,10 +194,10 @@ const LoginPage = () => {
               type="submit"
               variant="primary"
               className="w-full"
-              disabled={isLoggingIn}
-              loading={isLoggingIn}
+              disabled={isSubmitting}
+              loading={isSubmitting}
             >
-              {isLoggingIn ? 'Signing in...' : 'Sign in'}
+              {isSubmitting ? 'Signing in...' : 'Sign in'}
             </Button>
           </div>
 

@@ -66,6 +66,61 @@ src/
 
 ---
 
+### 🔧 Vite Proxy and Environment Variable Setup
+
+To enable the frontend to correctly communicate with the FastAPI backend, follow these steps:
+
+#### 1. Configure `.env.local`
+Create a file named `.env.local` in the root of the frontend project and add:
+VITE_API_BASE_URL=/api
+
+This value is used in frontend code (e.g., Axios) to reference the backend API base path.
+
+> ❗️**Do NOT use the full backend URL** (e.g., http://localhost:8000). Just use `/api`.
+
+---
+
+#### 2. Configure Vite Proxy in `vite.config.js`
+
+Update your `vite.config.js` to forward `/api` calls to your backend running at `http://localhost:8000`.
+
+```js
+// vite.config.js
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import { resolve } from "path";
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: { "@": resolve(__dirname, "src") },
+  },
+  server: {
+    host: "0.0.0.0",
+    port: 3000,
+    strictPort: true,
+    hmr: {
+      protocol: "ws",
+      host: "localhost",
+      clientPort: 3000,
+    },
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+});
+
+### 🔧 VITE_API_BASE_URL
+
+If your FastAPI routes are mounted at `/api/v1`, make sure your `.env.local` is set as:
+VITE_API_BASE_URL=/api/v1
+
+
+
 📌 Notes:
 - Use Vite routing with `BrowserRouter`
 - Don’t use TypeScript

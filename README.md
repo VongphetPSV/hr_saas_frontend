@@ -36,13 +36,21 @@ A modern, multi-role Human Resource Management SaaS platform built with React, T
    npm install
    ```
 
-2. **Start development server**:
+2. **Set up environment**:
+   Create `.env.local` with:
+   ```bash
+   VITE_API_BASE_URL=/api
+   ```
+   This configures the API proxy to forward requests to your backend.
+
+3. **Start development server**:
    ```bash
    npm run dev
    ```
-   > **Note**: The development server runs on port 3000 by default. If you're using a proxy or Docker at port 3000, keep Vite at port 3000. Otherwise, you can access the app at http://localhost:5173.
+   > **Note**: The development server runs on port 3000. If using a proxy/docker at port 3000, ensure it points to Vite.
+   > **Important**: Service workers are automatically disabled in development to prevent caching issues. They are only enabled in production builds.
 
-3. **Build for production**:
+4. **Build for production**:
    ```bash
    npm run build
    ```

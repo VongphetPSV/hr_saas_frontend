@@ -9,7 +9,7 @@ export const useLogin = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosInstance.post('/api/auth/login', credentials);
+      const response = await axiosInstance.post('/auth/login', credentials);
       localStorage.setItem('accessToken', response.data.access_token);
       return response.data;
     } catch (err) {
@@ -32,7 +32,7 @@ export const useGetCurrentUser = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosInstance.get('/api/auth/me');
+      const response = await axiosInstance.get('/auth/me');
       setUser(response.data);
       return response.data;
     } catch (err) {
@@ -54,7 +54,7 @@ export const useRegisterUser = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axiosInstance.post('/api/auth/register', userData);
+      const response = await axiosInstance.post('/auth/register', userData);
       return response.data;
     } catch (err) {
       setError(err.response?.data?.detail || 'Registration failed');
