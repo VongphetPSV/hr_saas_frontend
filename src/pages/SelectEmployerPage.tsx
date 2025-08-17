@@ -2,13 +2,30 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useEmployers } from '@/hooks/api/useEmployers';
-import Button from '../components/Button';
-import Card from '../components/Card';
-import Spinner from '../components/Spinner';
+import Button from '@/components/Button';
+import Card from '@/components/Card';
+import Spinner from '@/components/Spinner';
 import { Building2, Search, ArrowRight, Users } from 'lucide-react';
+import type { User } from '@/types/core';
 
-const SelectEmployerPage = () => {
-  const [selectedEmployer, setSelectedEmployer] = useState(null);
+interface Employer {
+  id: string | number;
+  name: string;
+  domain: string;
+  employees: number;
+  industry: string;
+  logo: string;
+  description: string;
+}
+
+interface LoginResult {
+  success: boolean;
+  redirectTo?: string;
+  error?: Error;
+}
+
+const SelectEmployerPage: React.FC = () => {
+  const [selectedEmployer, setSelectedEmployer] = useState<Employer | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -22,7 +39,7 @@ const SelectEmployerPage = () => {
   }, [employers, isLoading]);
 
   // Mock employers data for development
-  const mockEmployers = [
+  const mockEmployers: Employer[] = [
     {
       id: 1,
       name: 'Acme Corporation',
@@ -69,13 +86,13 @@ const SelectEmployerPage = () => {
     (employer.industry || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const generateMockTenantToken = (employer, userRole) => {
+  const generateMockTenantToken = (employer: Employer, userRole: string): string => {
     const now = Math.floor(Date.now() / 1000);
     const exp = now + (24 * 60 * 60); // 24 hours
 
     const payload = {
       sub: user?.id || '123456789',
-      name: user?.name || 'Demo User',
+      name: user?.full_name || 'Demo User',
       email: user?.email || 'user@demo.com',
       tenant_roles: [userRole],
       tenant: {
@@ -92,7 +109,7 @@ const SelectEmployerPage = () => {
   };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginResult, setLoginResult] = useState(null);
+  const [loginResult, setLoginResult] = useState<LoginResult | null>(null);
 
   const handleSelectEmployer = async () => {
     if (!selectedEmployer || isSubmitting) return;
@@ -100,17 +117,27 @@ const SelectEmployerPage = () => {
     setIsSubmitting(true);
     try {
       // For demo purposes, assign a default role based on user or use 'staff'
-      const defaultRole = user?.platform_role === 'user' ? 'staff' : 'admin';
+      const defaultRole = user?.platform_role === 'USER' ? 'staff' : 'admin';
       
       // Generate mock tenant token
       const tenantToken = generateMockTenantToken(selectedEmployer, defaultRole);
       
-      // Login with tenant token
-      const result = await login(tenantToken, 'tenant');
-      setLoginResult(result);
+      // Store tenant info
+      localStorage.setItem('tenant_id', String(selectedEmployer.id));
+      localStorage.setItem('tenant_role', defaultRole);
+
+      // Navigate to appropriate dashboard
+      const redirectTo = user?.platform_role === 'USER' 
+        ? '/staff-dashboard'
+        : '/admin-dashboard';
+
+      setLoginResult({ success: true, redirectTo });
     } catch (error) {
       console.error('Failed to set tenant context:', error);
-      setLoginResult({ success: false, error });
+      setLoginResult({ 
+        success: false, 
+        error: error instanceof Error ? error : new Error('Failed to select employer') 
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -118,7 +145,7 @@ const SelectEmployerPage = () => {
 
   // Handle navigation after successful login
   useEffect(() => {
-    if (loginResult?.success) {
+    if (loginResult?.success && loginResult.redirectTo) {
       navigate(loginResult.redirectTo, { replace: true });
     } else if (loginResult?.error) {
       // Handle error case - could show error message
@@ -138,7 +165,7 @@ const SelectEmployerPage = () => {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Select Your Employer</h2>
             <p className="text-gray-600">
-              Hello {user?.name}, please select your employer to continue
+              Hello {user?.full_name}, please select your employer to continue
             </p>
           </div>
 
@@ -210,7 +237,6 @@ const SelectEmployerPage = () => {
               </div>
             ))}
           </div>
-
           )}
 
           {!isLoading && !error && filteredEmployers.length === 0 && (

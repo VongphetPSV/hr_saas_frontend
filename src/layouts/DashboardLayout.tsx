@@ -1,8 +1,13 @@
 import { useAuth } from '@/hooks/useAuth';
 import Sidebar from '@/components/Sidebar';
-import TopBar from '../components/TopBar';
+import TopBar from '@/components/TopBar';
+import React from 'react';
 
-const DashboardLayout = ({ children }) => {
+interface DashboardLayoutProps {
+  children: React.ReactNode;
+}
+
+const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const { loading } = useAuth();
 
   if (loading) {

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Bell, Search } from 'lucide-react';
-import { PlatformSidebar } from '../components/nav/PlatformSidebar';
+import PlatformSidebar from '../components/nav/PlatformSidebar';
 
 interface PlatformLayoutProps {
   children: React.ReactNode;
 }
 
-export const PlatformLayout = ({ children }: PlatformLayoutProps) => {
+const PlatformLayout = ({ children }: PlatformLayoutProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
@@ -88,3 +88,5 @@ export const PlatformLayout = ({ children }: PlatformLayoutProps) => {
     </div>
   );
 };
+
+export default PlatformLayout;

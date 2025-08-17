@@ -10,7 +10,7 @@ interface SidebarItemProps {
   badge?: number;
 }
 
-export const SidebarItem = ({ to, icon: Icon, label, collapsed, badge }: SidebarItemProps) => {
+const SidebarItem = ({ to, icon: Icon, label, collapsed, badge }: SidebarItemProps) => {
   const content = (
     <NavLink
       to={to}
@@ -67,3 +67,5 @@ export const SidebarItem = ({ to, icon: Icon, label, collapsed, badge }: Sidebar
 
   return content;
 };
+
+export default SidebarItem;

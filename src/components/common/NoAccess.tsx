@@ -1,7 +1,8 @@
+import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { XCircle } from 'lucide-react';
 
-export const NoAccess = () => {
+const NoAccess: FC = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <div className="rounded-full bg-red-100 p-3">
@@ -22,3 +23,5 @@ export const NoAccess = () => {
     </div>
   );
 };
+
+export default NoAccess;

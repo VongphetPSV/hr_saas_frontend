@@ -1,4 +1,6 @@
-export function ResolvingTenant() {
+import { FC } from 'react';
+
+const ResolvingTenant: FC = () => {
   return (
     <div className="min-h-screen grid place-items-center text-slate-600">
       <div className="flex items-center gap-3">
@@ -7,4 +9,6 @@ export function ResolvingTenant() {
       </div>
     </div>
   );
-}
+};
+
+export default ResolvingTenant;

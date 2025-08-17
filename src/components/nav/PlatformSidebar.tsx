@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ChevronLeft, ChevronRight, Menu, MoreVertical } from 'lucide-react';
 import { platformNav } from './platformNav';
-import { SidebarItem } from './SidebarItem';
+import SidebarItem from './SidebarItem';
 import { useAuth } from '../../hooks/useAuth';
 
 interface PlatformSidebarProps {
@@ -12,7 +12,7 @@ interface PlatformSidebarProps {
 
 const STORAGE_KEY = 'platform_sidebar_collapsed';
 
-export const PlatformSidebar = ({ mobileOpen, onMobileClose }: PlatformSidebarProps) => {
+const PlatformSidebar = ({ mobileOpen, onMobileClose }: PlatformSidebarProps) => {
   const [collapsed, setCollapsed] = useState(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : false;
@@ -151,3 +151,5 @@ export const PlatformSidebar = ({ mobileOpen, onMobileClose }: PlatformSidebarPr
     </div>
   );
 };
+
+export default PlatformSidebar;

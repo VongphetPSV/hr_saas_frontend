@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Building2, ChevronRight } from 'lucide-react';
-import { useEmployers } from '../../hooks/useEmployers';
+import { useEmployers, type Employer } from '@/hooks/api/useEmployers';
 import Spinner from '../../components/Spinner';
 
 const ROLES_TO_ROUTES = {
@@ -11,11 +11,11 @@ const ROLES_TO_ROUTES = {
   staff: '/staff-dashboard',
   finance: '/finance-dashboard',
   director: '/director-dashboard',
-};
+} as const;
 
 const SelectEmployer = () => {
   const navigate = useNavigate();
-  const [selectedEmployer, setSelectedEmployer] = useState(null);
+  const [selectedEmployer, setSelectedEmployer] = useState<Employer | null>(null);
   const { data: employers, isLoading, error } = useEmployers();
 
   // Try to load cached employers on mount
@@ -39,16 +39,17 @@ const SelectEmployer = () => {
     }
   }, [employers]);
 
-  const handleSelectEmployer = (employer) => {
+  const handleSelectEmployer = (employer: Employer) => {
     setSelectedEmployer(employer);
-    localStorage.setItem('tenant_id', employer.tenant_id);
-    localStorage.setItem('tenant_role', employer.tenant_role);
+    localStorage.setItem('tenant_id', employer.id);
+    localStorage.setItem('tenant_role', employer.type || 'staff');
     
-    const redirectPath = ROLES_TO_ROUTES[employer.tenant_role.toLowerCase()];
+    const role = (employer.type || 'staff').toLowerCase();
+    const redirectPath = ROLES_TO_ROUTES[role as keyof typeof ROLES_TO_ROUTES];
     if (redirectPath) {
       navigate(redirectPath, { replace: true });
     } else {
-      console.error('Unknown tenant role:', employer.tenant_role);
+      console.error('Unknown tenant role:', role);
       navigate('/', { replace: true });
     }
   };
@@ -82,7 +83,7 @@ const SelectEmployer = () => {
             Error Loading Organizations
           </h2>
           <p className="text-sm text-gray-500">
-            {error?.response?.data?.message || 'Failed to load your organizations. Please try again.'}
+            {(error as any)?.response?.data?.message || 'Failed to load your organizations. Please try again.'}
           </p>
           <button
             onClick={handleLogout}
@@ -134,7 +135,7 @@ const SelectEmployer = () => {
         <div className="mt-8 space-y-4">
           {employers.map((employer) => (
             <button
-              key={employer.tenant_id}
+              key={employer.id}
               onClick={() => handleSelectEmployer(employer)}
               className="w-full flex items-center justify-between p-4 border rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
@@ -144,10 +145,10 @@ const SelectEmployer = () => {
                 </div>
                 <div className="ml-4 text-left">
                   <p className="text-sm font-medium text-gray-900">
-                    {employer.tenant_name}
+                    {employer.name}
                   </p>
                   <p className="text-xs text-gray-500 capitalize">
-                    {employer.tenant_role.toLowerCase()}
+                    {employer.type?.toLowerCase() || 'Staff'}
                   </p>
                 </div>
               </div>

@@ -4,6 +4,8 @@ interface TooltipProviderProps {
   children: React.ReactNode;
 }
 
-export const TooltipProvider = ({ children }: TooltipProviderProps) => {
+const TooltipProvider = ({ children }: TooltipProviderProps) => {
   return <Provider delayDuration={100}>{children}</Provider>;
 };
+
+export default TooltipProvider;

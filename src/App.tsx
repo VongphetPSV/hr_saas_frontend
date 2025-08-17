@@ -1,10 +1,11 @@
 import "./index.css";
-import { useAuth } from '@/hooks/useAuth';
+import { useCurrentUser } from '@/hooks/useAuth';
 import AppRouter from './router/AppRouter';
-import { TooltipProvider } from './components/providers/TooltipProvider';
+import TooltipProvider from './components/providers/TooltipProvider';
 import { AuthProvider } from './components/providers/AuthProvider';
+import React from 'react';
 
-function App() {
+const App: React.FC = () => {
   return (
     <TooltipProvider>
       <AuthProvider>
@@ -12,6 +13,6 @@ function App() {
       </AuthProvider>
     </TooltipProvider>
   );
-}
+};
 
 export default App;
