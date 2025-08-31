@@ -3,25 +3,33 @@
 
   "rules": [
     {
-      "pattern": "src/**/*.jsx",
+      "pattern": "src/**/*.tsx",
       "instructions": [
-        "Use only JavaScript (no TypeScript).",
+        "Use TypeScript with strict typing.",
         "Use functional components only.",
         "Use Tailwind CSS for all styling. Do NOT use inline styles or external CSS files.",
         "Use self-contained, role-based logic where applicable (e.g. show HR sidebar for hr role only)."
       ]
     },
     {
-      "pattern": "src/layouts/**/*.jsx",
+      "pattern": "src/**/*.ts",
+      "instructions": [
+        "Use TypeScript for all utility, hook, and service files.",
+        "Ensure strict typing and define types/interfaces for API responses and data models.",
+        "Prefer named exports for maintainability."
+      ]
+    },
+    {
+      "pattern": "src/layouts/**/*.tsx",
       "instructions": [
         "Create responsive layouts using Tailwind grid or flex utilities.",
-        "Include a sidebar and topbar in `DashboardLayout.jsx`.",
+        "Include a sidebar and topbar in `DashboardLayout.tsx`.",
         "Sidebar menu should change based on user role (platform vs tenant).",
         "Implement `toggleSidebar` prop for mobile responsiveness."
       ]
     },
     {
-      "pattern": "src/pages/**/*.jsx",
+      "pattern": "src/pages/**/*.tsx",
       "instructions": [
         "Each page should be a functional component with minimal logic.",
         "Only handle UI rendering here. Use hooks or services for logic.",
@@ -29,15 +37,16 @@
       ]
     },
     {
-      "pattern": "src/hooks/useAuth.js",
+      "pattern": "src/hooks/useAuth.ts",
       "instructions": [
         "Create a custom hook that reads JWT from localStorage or cookie.",
         "Decode the token using `jwt-decode` to extract `platform_role`, `tenant_role`, and `tenant_id`.",
-        "Provide auth info and login status reactively."
+        "Provide auth info and login status reactively.",
+        "Use appropriate TypeScript types for token and auth state."
       ]
     },
     {
-      "pattern": "src/router/AppRouter.jsx",
+      "pattern": "src/router/AppRouter.tsx",
       "instructions": [
         "Use `react-router-dom` v6 with `BrowserRouter`, `Routes`, and `Route`.",
         "Use `Navigate` to redirect users to the correct dashboard after login based on role.",
@@ -48,21 +57,23 @@
       "pattern": "tailwind.config.js",
       "instructions": [
         "Extend the default theme with Inter font and a primary color (blue).",
-        "Include content from `./index.html` and all `src/**/*.{js,jsx}`."
+        "Include content from `./index.html` and all `src/**/*.{ts,tsx}`."
       ]
     },
     {
-      "pattern": "src/components/**/*.jsx",
+      "pattern": "src/components/**/*.tsx",
       "instructions": [
         "Make reusable components: `Button`, `Input`, `Sidebar`, `TopBar`.",
-        "Use Tailwind for styling; support `className` override."
+        "Use Tailwind for styling; support `className` override.",
+        "Ensure all props are typed using interfaces."
       ]
     },
     {
-      "pattern": "src/services/api.js",
+      "pattern": "src/services/api.ts",
       "instructions": [
-        "Create reusable axios instance with token support via interceptors.",
-        "Add example GET and POST requests with mocked endpoints."
+        "Create a reusable Axios instance with token support via interceptors.",
+        "Add example GET and POST requests with mocked endpoints.",
+        "Use TypeScript interfaces for request/response typing."
       ]
     }
   ]

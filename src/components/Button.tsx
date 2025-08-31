@@ -1,4 +1,14 @@
-const Button = ({ 
+import { ButtonProps } from '@/types/common';
+
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+type ButtonSize = 'sm' | 'md' | 'lg' | 'xl';
+
+interface Props extends ButtonProps {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+}
+
+const Button: React.FC<Props> = ({ 
   children, 
   variant = 'primary', 
   size = 'md', 

@@ -1,130 +1,190 @@
-Project: HRM SaaS Frontend  
-Tech stack: React (Vite), Tailwind CSS, JavaScript (no TypeScript), React Router v6
+✅ Updated Setup Guide: setup-arm-frontend.md (TypeScript Version)
 
-Goal:
-Build a modern, multi-role HRM SaaS frontend UI based on existing Tailwind+React setup. The app will support role-based dashboards and navigation for:
-- Platform roles: `super_admin`, `sales_consultant`, `platform_manager`
-- Tenant roles: `admin`, `hr`, `staff`, `manager`, `finance`, `director`
+Project: HRM SaaS Frontend
+Tech stack: React (Vite), Tailwind CSS, TypeScript, React Router v6
 
----
+🎯 Goal
 
-🎯 Tasks for Cursor:
+Build a modern, multi-role HRM SaaS frontend UI using React + TypeScript + Tailwind CSS. The app supports role-based dashboards and navigation for:
+	•	Platform roles: super_admin, sales_consultant, platform_manager
+	•	Tenant roles: admin, hr, staff, manager, finance, director
 
-1. 🔧 **Folder Structure (src/):**
+⸻
+
+🧠 Cursor Instructions Summary
+
+✅ Folder Structure (src/)
 src/
 ├── assets/
 ├── components/
-│   ├── Sidebar.jsx
-│   ├── TopBar.jsx
-│   ├── RoleGuard.jsx
+│   ├── Sidebar.tsx
+│   ├── TopBar.tsx
+│   ├── RoleGuard.tsx
 ├── hooks/
-│   └── useAuth.js
+│   └── useAuth.ts
 ├── layouts/
-│   └── DashboardLayout.jsx
+│   └── DashboardLayout.tsx
 ├── pages/
 │   ├── auth/
-│   │   ├── LoginPage.jsx
-│   │   ├── OTPPage.jsx
-│   │   └── ForgotPasswordPage.jsx
+│   │   ├── LoginPage.tsx
+│   │   ├── OTPPage.tsx
+│   │   └── ForgotPasswordPage.tsx
 │   ├── platform/
-│   │   ├── SuperAdminDashboard.jsx
-│   │   └── SalesDashboard.jsx
+│   │   ├── SuperAdminDashboard.tsx
+│   │   └── SalesDashboard.tsx
 │   ├── tenant/
-│   │   ├── HRDashboard.jsx
-│   │   └── StaffDashboard.jsx
-│   └── SelectEmployerPage.jsx
+│   │   ├── HRDashboard.tsx
+│   │   └── StaffDashboard.tsx
+│   └── SelectEmployerPage.tsx
 ├── router/
-│   └── AppRouter.jsx
+│   └── AppRouter.tsx
 ├── services/
-│   └── api.js
-├── App.jsx
-└── main.jsx
+│   └── api.ts
+├── App.tsx
+└── main.tsx
 
-2. ⚙️ **Create Tailwind theme overrides (tailwind.config.js):**
-- Add custom font: `'Inter', sans-serif`
-- Extend colors for primary (e.g. blue-600), background, sidebar
+✅ Use .tsx for components/pages and .ts for hooks/services.
 
-3. 🌐 **Set up `AppRouter.jsx` with role-based routing**
-- Read user token + role from `useAuth()`
-- Redirect based on role to appropriate dashboard
+⸻
 
-4. 📦 **Create `DashboardLayout.jsx`**
-- Responsive Sidebar + TopBar
-- Sidebar menus change based on role
+⚙️ Tailwind Configuration (tailwind.config.js)
 
-5. 📋 **Create sample pages:**
-- SuperAdminDashboard: "Welcome Super Admin"
-- SalesDashboard: "Welcome Sales Consultant"
-- HRDashboard: "Welcome HR"
-- StaffDashboard: "Welcome Staff"
-- LoginPage: Phone & password input
-- OTPPage: OTP verification form
+Add the following:
+// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
+      colors: {
+        primary: '#2563eb', // blue-600
+        background: '#f9fafb',
+        sidebar: '#1e293b',
+      },
+    },
+  },
+  plugins: [],
+};
+🌐 AppRouter Setup (src/router/AppRouter.tsx)
+	•	Use BrowserRouter, Routes, Route, and Navigate.
+	•	Implement ProtectedRoute and RoleGuard.
+	•	Use useAuth() to redirect users based on their roles after login.
 
-6. 🔐 **Implement `useAuth.js`**
-- Handles JWT token from localStorage
-- Decodes token to extract role and tenant
+⸻
 
----
+📦 Create DashboardLayout.tsx
+	•	Responsive sidebar + topbar using Tailwind flex and grid
+	•	Menu items should adapt based on platform_role or tenant_role
+	•	Accept toggleSidebar prop for mobile support
 
-### 🔧 Vite Proxy and Environment Variable Setup
+⸻
 
-To enable the frontend to correctly communicate with the FastAPI backend, follow these steps:
+📋 Sample Pages to Create (TypeScript + Tailwind)
+	•	SuperAdminDashboard.tsx: "Welcome Super Admin"
+	•	SalesDashboard.tsx: "Welcome Sales Consultant"
+	•	HRDashboard.tsx: "Welcome HR"
+	•	StaffDashboard.tsx: "Welcome Staff"
+	•	LoginPage.tsx: Phone + password input
+	•	OTPPage.tsx: OTP verification form
 
-#### 1. Configure `.env.local`
-Create a file named `.env.local` in the root of the frontend project and add:
-VITE_API_BASE_URL=/api
+💡 Use interface Props and useState, useEffect with types.
 
-This value is used in frontend code (e.g., Axios) to reference the backend API base path.
+⸻
 
-> ❗️**Do NOT use the full backend URL** (e.g., http://localhost:8000). Just use `/api`.
+🔐 Auth Hook (src/hooks/useAuth.ts)
+	•	Read JWT from localStorage or cookie
+	•	Decode with jwt-decode to extract:
+	•	platform_role
+	•	tenant_role
+	•	tenant_id
+	•	Return auth object with types:
+  interface AuthData {
+  token: string | null;
+  isLoggedIn: boolean;
+  platform_role?: string;
+  tenant_role?: string;
+  tenant_id?: string;
+}
 
----
+🧪 Vite + FastAPI Integration
 
-#### 2. Configure Vite Proxy in `vite.config.js`
+1. .env.local
+VITE_API_BASE_URL=/api/v1
+❗ Do not use full URL like http://localhost:8000 in .env.local. Use relative path /api/v1.
 
-Update your `vite.config.js` to forward `/api` calls to your backend running at `http://localhost:8000`.
+⸻
 
-```js
-// vite.config.js
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import { resolve } from "path";
+2. vite.config.ts (Update from .js to .ts)
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: { "@": resolve(__dirname, "src") },
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
   },
   server: {
-    host: "0.0.0.0",
+    host: '0.0.0.0',
     port: 3000,
     strictPort: true,
     hmr: {
-      protocol: "ws",
-      host: "localhost",
+      protocol: 'ws',
+      host: 'localhost',
       clientPort: 3000,
     },
     proxy: {
-      "/api": {
-        target: "http://localhost:8000",
+      '/api': {
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       },
     },
   },
 });
+✅ Component Conventions
+	•	Use reusable components in /components: Button.tsx, Input.tsx, Card.tsx
+	•	Use className for Tailwind styling
+	•	Keep logic in hooks/services and UI in components
 
-### 🔧 VITE_API_BASE_URL
+⸻
 
-If your FastAPI routes are mounted at `/api/v1`, make sure your `.env.local` is set as:
-VITE_API_BASE_URL=/api/v1
+🧱 Starter Component Example (TypeScript)
+// src/components/Button.tsx
+import React from 'react';
 
+interface ButtonProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  className?: string;
+  type?: 'button' | 'submit' | 'reset';
+}
 
-
-📌 Notes:
-- Use Vite routing with `BrowserRouter`
-- Don’t use TypeScript
-- Stick with TailwindCSS for all styles
-- Use basic reusable `Button`, `Input`, and `Card` components
-
-Generate boilerplate code for each component so we can quickly build upon them later.
+export const Button: React.FC<ButtonProps> = ({
+  children,
+  onClick,
+  className = '',
+  type = 'button',
+}) => {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      className={`px-4 py-2 bg-primary text-white rounded ${className}`}
+    >
+      {children}
+    </button>
+  );
+};
+📌 Notes
+	•	✅ Use BrowserRouter (React Router v6)
+	•	✅ Use .tsx and .ts across the entire app
+	•	✅ Avoid inline styles and external CSS files
+	•	✅ Use Tailwind CSS for styling
+	•	✅ Add types for all props, state, hooks, API calls
+	•	❌ Don’t use JavaScript files (.js, .jsx)S

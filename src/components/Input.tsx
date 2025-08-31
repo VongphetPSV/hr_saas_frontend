@@ -1,6 +1,11 @@
-import { forwardRef } from 'react';
+import { forwardRef, ForwardedRef } from 'react';
+import { InputProps } from '@/types/common';
 
-const Input = forwardRef(({ 
+interface Props extends InputProps {
+  ref?: ForwardedRef<HTMLInputElement>;
+}
+
+const Input = forwardRef<HTMLInputElement, Props>(({ 
   label,
   error,
   type = 'text',

@@ -3,12 +3,12 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useCurrentUser } from '@/hooks/useAuth'
 import type { User } from '@/types/core'
 
-interface AuthContextValue {
-  user: User | null | undefined
-  isAuthenticated: boolean
+import { AuthContextType, AuthProviderProps, AuthState } from '@/types/auth'
+import { LoginRequest } from '@/types/api'
+
+interface AuthContextValue extends Omit<AuthContextType, 'token' | 'error' | 'refreshToken' | 'updateUser'> {
   isLoading: boolean
-  login: (credentials: { phone_number: string; password: string }) => Promise<void>
-  logout: () => void
+  login: (credentials: LoginRequest) => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextValue>({

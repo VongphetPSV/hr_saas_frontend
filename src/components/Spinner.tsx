@@ -1,4 +1,12 @@
-const Spinner = ({ size = 'md', className = '' }) => {
+import { LoadingProps } from '@/types/common';
+
+type SpinnerSize = 'sm' | 'md' | 'lg';
+
+interface Props extends LoadingProps {
+  size?: SpinnerSize;
+}
+
+const Spinner: React.FC<Props> = ({ size = 'md', className = '' }) => {
   const sizes = {
     sm: 'h-4 w-4',
     md: 'h-8 w-8',

@@ -2,33 +2,24 @@ import { useState } from 'react';
 import api from '@/api/axios';
 import type { ApiResponse } from '@/types/core';
 
-interface LeaveData {
-  start_date: string;
-  end_date: string;
-  reason: string;
-  type: string;
+import { Leave, CreateLeaveRequest } from '@/types/api';
+import { UseLeaveReturn } from '@/types/hooks';
+
+interface UseSubmitLeaveReturn {
+  submitLeave: (leaveData: CreateLeaveRequest) => Promise<Leave>;
+  loading: boolean;
+  error: string | null;
 }
 
-interface LeaveResponse {
-  id: string;
-  status: 'pending' | 'approved' | 'rejected';
-  created_at: string;
-  updated_at: string;
-  start_date: string;
-  end_date: string;
-  reason: string;
-  type: string;
-}
-
-export const useSubmitLeave = () => {
+export const useSubmitLeave = (): UseSubmitLeaveReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const submitLeave = async (leaveData: LeaveData) => {
+  const submitLeave = async (leaveData: CreateLeaveRequest): Promise<Leave> => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.post<ApiResponse<LeaveResponse>>('/leave/', leaveData);
+      const response = await api.post<ApiResponse<Leave>>('/leave/', leaveData);
       return response.data.data;
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Failed to submit leave request');

@@ -2,36 +2,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import api from '@/api/axios';
 import { getAccessToken, setAccessToken, isTokenExpired, willTokenExpireSoon } from '@/lib/tokenUtils';
+import { TenantRole } from '@/types/core';
 
 // Constants
 const AUTH_STALE_TIME = 5 * 60 * 1000; // 5 minutes
 const USER_QUERY_KEY = ['currentUser'] as const;
 
-export type PlatformRole = 'USER' | 'ADMIN' | 'SUPER_ADMIN';
+import { User, PlatformRole } from '@/types/core';
+import { LoginRequest, LoginResponse } from '@/types/api';
+import { AuthError } from '@/types/auth';
 
-export interface CurrentUser {
-  id: string;
-  phone_number: string;
-  full_name: string;
-  email: string;
-  platform_role: PlatformRole;
-}
-
-export interface AuthError extends Error {
-  code?: string;
-  httpStatus?: number;
-  detail?: string;
-}
-
-interface LoginResponse {
-  access_token: string;
-  token_type: string;
-}
-
-interface LoginCredentials {
-  phone_number: string;
-  password: string;
-}
+export type { PlatformRole };
+export type CurrentUser = User;
 
 // Cache utilities
 function getCachedUser(): CurrentUser | null {
@@ -258,7 +240,7 @@ export function useAuth(): UseAuthReturn {
     localStorage.setItem('activeTenantId', tenantId);
     
     try {
-      await api.post('tenants/active', { tenant_id: tenantId }, {
+      await api.get(`tenants/active/${tenantId}`, {
         validateStatus: (status) => status === 200 || status === 404
       });
     } catch (error) {

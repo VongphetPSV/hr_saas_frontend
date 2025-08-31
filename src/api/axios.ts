@@ -1,4 +1,14 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios from 'axios';
+import {
+  ApiRequestConfig,
+  ApiError,
+  RefreshTokenResponse,
+  TokenRefreshSubscriber,
+  ApiInterceptorRequest,
+  ApiInterceptorRequestError,
+  ApiInterceptorResponse,
+  ApiInterceptorResponseError,
+} from './types';
 import { getAccessToken, setAccessToken, clearAuthData, willTokenExpireSoon, isValidTokenFormat } from '@/lib/tokenUtils';
 import { joinUrl, ensureNoDoubleSegments } from '@/lib/url';
 
@@ -24,7 +34,7 @@ const refreshApi = axios.create({
 
 // Track refresh token state
 let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+let refreshSubscribers: TokenRefreshSubscriber[] = [];
 
 /**
  * Subscribe to token refresh
@@ -53,7 +63,7 @@ function onRefreshError() {
  */
 async function refreshAccessToken(): Promise<string> {
   try {
-    const { data } = await refreshApi.post<{ access_token: string }>('/auth/refresh');
+    const { data } = await refreshApi.post<RefreshTokenResponse>('/auth/refresh');
     
     if (!data?.access_token || !isValidTokenFormat(data.access_token)) {
       throw new Error('Invalid refresh token response');
@@ -69,7 +79,7 @@ async function refreshAccessToken(): Promise<string> {
 
 // Request interceptor
 api.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
+  async (config: ApiRequestConfig) => {
     const token = getAccessToken();
     
     // Skip token check for refresh requests
@@ -107,8 +117,8 @@ api.interceptors.request.use(
 // Response interceptor
 api.interceptors.response.use(
   (response) => response,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+  async (error: ApiError) => {
+    const originalRequest = error.config;
     
     // Handle 401 responses
     if (error.response?.status === 401 && !originalRequest._retry) {

@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { listAnnouncements, type Announcement } from '@/api/announcementsClient';
 
-export const useAnnouncements = () => {
+import { UseAnnouncementsReturn } from '@/types/hooks';
+
+export const useAnnouncements = (): UseAnnouncementsReturn => {
   return useQuery<Announcement[]>({
     queryKey: ['announcements'],
     queryFn: () => listAnnouncements(),

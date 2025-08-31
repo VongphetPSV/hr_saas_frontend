@@ -1,4 +1,14 @@
-const Card = ({ 
+import { CardProps } from '@/types/common';
+
+type CardPadding = 'none' | 'sm' | 'md' | 'lg';
+type CardShadow = 'none' | 'sm' | 'default' | 'md' | 'lg';
+
+interface Props extends CardProps {
+  padding?: CardPadding;
+  shadow?: CardShadow;
+}
+
+const Card: React.FC<Props> = ({ 
   children, 
   className = '',
   padding = 'md',

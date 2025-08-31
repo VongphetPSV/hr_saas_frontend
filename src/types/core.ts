@@ -5,12 +5,12 @@ export interface User {
   id: string;
   full_name: string;
   email?: string;
-  phone_number?: string;
-  platform_role: PlatformRole;
-  tenant_role?: TenantRole;
-  is_active: boolean;
-  created_at?: string;
-  updated_at?: string;
+  platform_role?: PlatformRole;
+  current_tenant_role?: TenantRole;
+  current_tenant?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface TenantAssignment {
@@ -19,14 +19,7 @@ export interface TenantAssignment {
   tenant_role: TenantRole;
 }
 
-export interface ApiResponse<T> { 
-  data: T; 
-  message?: string; 
-}
-
-export interface Paginated<T> { 
-  items: T[]; 
-  page: number; 
-  page_size: number; 
-  total: number; 
+export interface ApiResponse<T> {
+  data: T;
+  message?: string;
 }
