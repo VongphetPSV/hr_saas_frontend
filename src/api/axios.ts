@@ -81,6 +81,7 @@ async function refreshAccessToken(): Promise<string> {
 api.interceptors.request.use(
   async (config: ApiRequestConfig) => {
     const token = getAccessToken();
+    const tenantId = localStorage.getItem('activeTenantId'); // Add this
     
     // Skip token check for refresh requests
     if (config.url?.includes('auth/refresh')) {
@@ -88,16 +89,13 @@ api.interceptors.request.use(
     }
     
     try {
-      // Check if token exists and will expire soon
+      // Token refresh logic (existing code)
       if (token && willTokenExpireSoon(token)) {
-        // Attempt proactive refresh
         try {
           const newToken = await refreshAccessToken();
           config.headers.Authorization = `Bearer ${newToken}`;
-          return config;
         } catch {
-          // If refresh fails, continue with original request
-          // Response interceptor will handle 401
+          // Continue with original request
         }
       }
       
@@ -105,8 +103,13 @@ api.interceptors.request.use(
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
+      
+      // Add tenant ID header if exists (ADD THIS)
+      if (tenantId) {
+        config.headers['X-Tenant-Id'] = tenantId;
+      }
     } catch {
-      // If token validation fails, continue without token
+      // Continue without token
     }
     
     return config;

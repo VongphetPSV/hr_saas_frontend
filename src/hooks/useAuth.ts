@@ -237,11 +237,22 @@ export function useAuth(): UseAuthReturn {
   };
 
   const setActiveTenant = async (tenantId: string) => {
-    localStorage.setItem('activeTenantId', tenantId);
-    
+    localStorage.setItem("activeTenantId", tenantId);
+
+    // Set tenant ID in API headers for future requests
+    if (api.defaults.headers) {
+      api.defaults.headers.common["X-Tenant-Id"] = tenantId;
+    }
+
     try {
       await api.get(`tenants/active/${tenantId}`, {
-        validateStatus: (status) => status === 200 || status === 404
+        validateStatus: (status) => status === 200 || status === 404,
+        // Add this to prevent axios from throwing on 404
+        transitional: {
+          silentJSONParsing: true,
+          forcedJSONParsing: true,
+          clarifyTimeoutError: false,
+        },
       });
     } catch (error) {
       // Ignore errors - endpoint is optional

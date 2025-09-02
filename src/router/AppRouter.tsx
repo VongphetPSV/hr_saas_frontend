@@ -22,6 +22,7 @@ import StaffDashboard from '@/pages/tenant/StaffDashboard'
 import ManagerDashboard from '@/pages/tenant/ManagerDashboard'
 import FinanceDashboard from '@/pages/tenant/FinanceDashboard'
 import DirectorDashboard from '@/pages/tenant/DirectorDashboard'
+import StaffDirectory from "@/pages/tenant/StaffDirectory";
 
 // Billing Pages
 import Paywall from '@/pages/billing/Paywall'
@@ -82,111 +83,157 @@ function AppRoutes() {
     <Routes>
       {/* Public Routes */}
       <Route path="/auth/login" element={<LoginPage />} />
-      
+
       {/* Protected Routes */}
-      <Route path="/select-employer" element={
-        <ProtectedRoute required="any">
-          <SelectEmployerPage />
-        </ProtectedRoute>
-      } />
+      <Route
+        path="/select-employer"
+        element={
+          <ProtectedRoute required="any">
+            <SelectEmployerPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Billing Routes */}
-      <Route path="/billing/paywall" element={
-        <ProtectedRoute required="any">
-          <Paywall />
-        </ProtectedRoute>
-      } />
+      <Route
+        path="/billing/paywall"
+        element={
+          <ProtectedRoute required="any">
+            <Paywall />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Platform Routes */}
-      <Route path="/platform-dashboard" element={
-        <ProtectedRoute required="platform">
-          <PlatformLayout>
-            <PlatformDashboard />
-          </PlatformLayout>
-        </ProtectedRoute>
-      } />
+      <Route
+        path="/platform-dashboard"
+        element={
+          <ProtectedRoute required="platform">
+            <PlatformLayout>
+              <PlatformDashboard />
+            </PlatformLayout>
+          </ProtectedRoute>
+        }
+      />
 
-      <Route path="/sales-dashboard" element={
-        <ProtectedRoute required="platform">
-          <PlatformLayout>
-            <SalesDashboard />
-          </PlatformLayout>
-        </ProtectedRoute>
-      } />
+      <Route
+        path="/sales-dashboard"
+        element={
+          <ProtectedRoute required="platform">
+            <PlatformLayout>
+              <SalesDashboard />
+            </PlatformLayout>
+          </ProtectedRoute>
+        }
+      />
 
       {/* HR Module Routes - Protected by Subscription */}
-      <Route path="/hr-dashboard" element={
-        <ProtectedRoute required="tenant">
-          <RequirePaidTenant>
-            <DashboardLayout>
-              <HRDashboard />
-            </DashboardLayout>
-          </RequirePaidTenant>
-        </ProtectedRoute>
-      } />
+      <Route
+        path="/hr-dashboard"
+        element={
+          <ProtectedRoute required="tenant">
+            <RequirePaidTenant>
+              <DashboardLayout>
+                <HRDashboard />
+              </DashboardLayout>
+            </RequirePaidTenant>
+          </ProtectedRoute>
+        }
+      />
 
-      <Route path="/staff-dashboard" element={
-        <ProtectedRoute required="tenant">
-          <RequirePaidTenant>
+      <Route
+        path="/staff-dashboard"
+        element={
+          <ProtectedRoute required="tenant">
+            <RequirePaidTenant>
+              <DashboardLayout>
+                <StaffDashboard />
+              </DashboardLayout>
+            </RequirePaidTenant>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/staff-dashboard"
+        element={
+          <ProtectedRoute required="tenant">
+            <RequirePaidTenant>
+              <DashboardLayout>
+                <StaffDirectory />
+              </DashboardLayout>
+            </RequirePaidTenant>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/manager-dashboard"
+        element={
+          <ProtectedRoute required="tenant">
+            <RequirePaidTenant>
+              <DashboardLayout>
+                <ManagerDashboard />
+              </DashboardLayout>
+            </RequirePaidTenant>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Finance Routes - Not Protected by Subscription */}
+      <Route
+        path="/finance-dashboard"
+        element={
+          <ProtectedRoute required="tenant">
+            <DashboardLayout>
+              <FinanceDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Admin Routes - Not Protected by Subscription */}
+      <Route
+        path="/admin-dashboard"
+        element={
+          <ProtectedRoute required="tenant">
+            <DashboardLayout>
+              <AdminDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/director-dashboard"
+        element={
+          <ProtectedRoute required="tenant">
+            <DashboardLayout>
+              <DirectorDashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Default Dashboard */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute required="tenant">
             <DashboardLayout>
               <StaffDashboard />
             </DashboardLayout>
-          </RequirePaidTenant>
-        </ProtectedRoute>
-      } />
-
-      <Route path="/manager-dashboard" element={
-        <ProtectedRoute required="tenant">
-          <RequirePaidTenant>
-            <DashboardLayout>
-              <ManagerDashboard />
-            </DashboardLayout>
-          </RequirePaidTenant>
-        </ProtectedRoute>
-      } />
-
-      {/* Finance Routes - Not Protected by Subscription */}
-      <Route path="/finance-dashboard" element={
-        <ProtectedRoute required="tenant">
-          <DashboardLayout>
-            <FinanceDashboard />
-          </DashboardLayout>
-        </ProtectedRoute>
-      } />
-
-      {/* Admin Routes - Not Protected by Subscription */}
-      <Route path="/admin-dashboard" element={
-        <ProtectedRoute required="tenant">
-          <DashboardLayout>
-            <AdminDashboard />
-          </DashboardLayout>
-        </ProtectedRoute>
-      } />
-
-      <Route path="/director-dashboard" element={
-        <ProtectedRoute required="tenant">
-          <DashboardLayout>
-            <DirectorDashboard />
-          </DashboardLayout>
-        </ProtectedRoute>
-      } />
-
-      {/* Default Dashboard */}
-      <Route path="/dashboard" element={
-        <ProtectedRoute required="tenant">
-          <DashboardLayout>
-            <StaffDashboard />
-          </DashboardLayout>
-        </ProtectedRoute>
-      } />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Redirect root to login */}
       <Route path="/" element={<Navigate to="/auth/login" replace />} />
-      
+
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/auth/login" replace />} />
     </Routes>
-  )
+  );
 }
 
 export default function AppRouter() {
