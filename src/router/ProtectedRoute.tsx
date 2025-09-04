@@ -1,26 +1,36 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useCurrentUser, PlatformRole } from '@/hooks/useAuth';
-import NoAccess from '@/components/common/NoAccess';
+// src/router/ProtectedRoute.tsx
+import React, { ReactElement } from "react";
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { UserRole } from "@/types/user";
 
 interface ProtectedRouteProps {
-  children: JSX.Element;
-  requirePlatformRole?: PlatformRole[];
+  element: ReactElement;
+  allowedRoles: UserRole[];
 }
 
-export default function ProtectedRoute({ children, requirePlatformRole }: ProtectedRouteProps) {
-  const { data: user, isLoading } = useCurrentUser();
-  const location = useLocation();
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  element,
+  allowedRoles,
+}) => {
+  const { user, isAuthenticated } = useAuth();
 
-  if (isLoading) return null; // or a spinner
-
-  if (!user) {
-    // not logged in -> go to login, keep where we were going
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  // Not authenticated, redirect to login
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
-  if (requirePlatformRole && !requirePlatformRole.includes(user.platform_role)) {
-    return <NoAccess />;
+  // Check if user has allowed role
+  const hasRequiredRole =
+    user?.roles && allowedRoles.some((role) => user.roles.includes(role));
+
+  // If no allowed role, redirect to unauthorized or dashboard
+  if (!hasRequiredRole) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
-  return children;
-}
+  // Render the protected component
+  return element;
+};
+
+export default ProtectedRoute;
